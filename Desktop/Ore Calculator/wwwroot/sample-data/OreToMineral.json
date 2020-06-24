@@ -1,0 +1,129 @@
+[
+  {
+    "Name": "Dense Veldspar",
+    "Volume": "0.1",
+    "Minerals": [
+      {
+        "Name": "Tritanium",
+        "Amount": 457
+      }
+    ],
+    "KeyMineral": "Tritanium"
+  },
+
+  {
+    "Name": "Massive Scordite",
+    "Volume": "0.15",
+    "Minerals": [
+      {
+        "Name": "Pyerite",
+        "Amount": 190
+      },
+      {
+        "Name": "Tritanium",
+        "Amount": 457
+      }
+    ],
+    "KeyMineral": "Pyerite"
+  },
+
+  {
+    "Name": "Prismatic Gneiss",
+    "Volume": "5",
+    "Minerals": [
+      {
+        "Name": "Mexallon",
+        "Amount": 2640
+      },
+      {
+        "Name": "Pyerite",
+        "Amount": 2420
+      },
+      {
+        "Name": "Isogen",
+        "Amount": 330
+      }
+    ],
+    "KeyMineral": "Mexallon"
+  },
+
+  {
+    "Name": "Obsidian Ochre",
+    "Volume": "8",
+    "Minerals": [
+      {
+        "Name": "Isogen",
+        "Amount": 1760
+      },
+      {
+        "Name": "Tritanium",
+        "Amount": 11000
+      },
+      {
+        "Name": "Nocxium",
+        "Amount": 132
+      }
+    ],
+    "KeyMineral": "Isogen"
+  },
+
+  {
+    "Name": "Crystalline Crokite",
+    "Volume": "16",
+    "Minerals": [
+      {
+        "Name": "Nocxium",
+        "Amount": 836
+      },
+      {
+        "Name": "Tritanium",
+        "Amount": 23100
+      },
+      {
+        "Name": "Zydrine",
+        "Amount": 149
+      }
+    ],
+    "KeyMineral": "Nocxium"
+  },
+
+  {
+    "Name": "Monoclinic Bistot",
+    "Volume": "16",
+    "Minerals": [
+      {
+        "Name": "Zydrine",
+        "Amount": 495
+      },
+      {
+        "Name": "Pyerite",
+        "Amount": 13200
+      },
+      {
+        "Name": "Megacyte",
+        "Amount": 110
+      }
+    ],
+    "KeyMineral": "Zydrine"
+  },
+
+  {
+    "Name": "Prime Arkonor",
+    "Volume": "16",
+    "Minerals": [
+      {
+        "Name": "Megacyte",
+        "Amount": 352
+      },
+      {
+        "Name": "Mexallon",
+        "Amount": 2750
+      },
+      {
+        "Name": "Tritanium",
+        "Amount": 24200
+      }
+    ],
+    "KeyMineral": "Megacyte"
+  }
+]

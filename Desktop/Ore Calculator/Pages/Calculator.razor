@@ -1,0 +1,206 @@
+﻿@page "/calculator"
+@inject HttpClient Http;
+
+<h1>Calculator</h1>
+
+@if (ores == null)
+{
+    // Loading
+    <p><em>Loading...</em></p>
+}
+else
+{
+    // Content
+<EditForm Model="@ores">
+    <p>Reprocessing Efficiency (%): </p> <InputNumber TValue="int" @bind-Value="@reprocessingEfficiency" />
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (string oreName in ORE_STRINGS)
+            {
+                int number = getMineralNumber(oreName);
+                <tr>
+                    <td>@oreName</td>
+                    <td>
+                        <InputNumber TValue="int" @bind-Value="@minerals[number].Amount" />
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <button class="btn btn-primary" @onclick="OnClick">Calculate</button>
+</EditForm>
+    @if (buttonClicked)
+    {
+        <div id="result-div">
+            @if (!calculationFinished)
+            {
+                <p><em>Calculating...</em></p>
+            }
+            else
+            {
+                <h2>Minerals acquired:</h2>
+                @foreach(Mineral min in workingMinerals)
+                {
+                    <p>@min.Name: @min.Amount</p>
+                }
+
+                <h2>Ores to buy:</h2>
+                @foreach(Ore ore in ores)
+                {
+                    <p>@ore.Name: @ore.Amount</p>
+                }
+            }
+        </div>
+
+    }
+}
+
+@code {
+    // Field Variables
+    private List<Ore> ores, workingOres;
+    private List<Mineral> minerals, workingMinerals;
+    private bool buttonClicked = false, calculationFinished = false;
+    private int reprocessingEfficiency = 80;
+
+    // Variables for ease of use
+    public static string TRITANIUM_STRING = "Tritanium",
+        PYERITE_STRING = "Pyerite",
+        MEXALLON_STRING = "Mexallon",
+        ISOGEN_STRING = "Isogen",
+        NOCXIUM_STRING = "Nocxium",
+        ZYDRINE_STRING = "Zydrine",
+        MEGACYTE_STRING = "Megacyte";
+
+    public static string[] ORE_STRINGS = new string[]
+    {
+        TRITANIUM_STRING,
+        PYERITE_STRING,
+        MEXALLON_STRING,
+        ISOGEN_STRING,
+        NOCXIUM_STRING,
+        ZYDRINE_STRING,
+        MEGACYTE_STRING
+                                        };
+
+    public int getMineralNumber(String mineralName)
+    {
+        for (int i = 0; i < ORE_STRINGS.Length; i++)
+        {
+            if (ORE_STRINGS[i].Equals(mineralName))
+                return i;
+        }
+        return -1;
+    }
+
+    // Initialize
+    protected override async Task OnInitializedAsync()
+    {
+        // Initialize Mineral List
+        minerals = new List<Mineral>();
+
+        for (int i = 0; i < ORE_STRINGS.Length; i++)
+        {
+            minerals.Add(new Mineral(ORE_STRINGS[i], 0));
+        }
+
+        HttpResponseMessage json = await Http.GetAsync("sample-data/OreToMineral.json");
+        string jsonString = await json.Content.ReadAsStringAsync();
+        ores = Newtonsoft.Json.JsonConvert.DeserializeObject<List<Ore>>(jsonString);
+    }
+
+    // Calculate Button click handler
+    private void OnClick()
+    {
+        calculationFinished = false;
+        buttonClicked = true;
+
+        Console.WriteLine("Minerales requested, showing or");
+        foreach (Mineral m in minerals)
+        {
+            Console.WriteLine("Name: " + m.Name + ", amount: " + m.Amount);
+        }
+        Console.WriteLine();
+
+        // Initialize Mineral List
+        workingMinerals = new List<Mineral>();
+
+        for (int i = 0; i < ORE_STRINGS.Length; i++)
+        {
+            workingMinerals.Add(new Mineral(ORE_STRINGS[i], 0));
+        }
+
+        workingOres = ores;
+
+        CalculateMinerals(75);
+        CalculateMinerals(100);
+        calculationFinished = true;
+    }
+
+    private void CalculateMinerals(int targetProcent)
+    {
+        for (int i = ores.Count - 1; i >= 0; i--)
+        {
+            Ore o = workingOres[i];
+            int n = getMineralNumber(o.KeyMineral);
+            double r = (double) reprocessingEfficiency / 100;
+
+            Mineral m = null;
+            foreach(Mineral min in o.Minerals)
+            {
+                if (min.Name.Equals(o.KeyMineral))
+                {
+                    m = min;
+                    break;
+                }
+            }
+
+            if (workingMinerals[n].Amount >= minerals[n].Amount)
+                continue;
+
+            o.Amount += (int) Math.Ceiling((double) ((((minerals[n].Amount / r * targetProcent) / 100) - workingMinerals[n].Amount) / m.Amount));
+
+            foreach(Mineral min in o.Minerals)
+            {
+                workingMinerals[getMineralNumber(min.Name)].Amount = (int) Math.Floor(o.Amount * (m.Amount * r));
+            }
+
+            workingOres[i] = o;
+        }
+    }
+
+    // Inner classes for Data storage
+    public class Ore
+    {
+        [Newtonsoft.Json.JsonProperty("Name")]
+        public string Name { get; set; }
+        [Newtonsoft.Json.JsonProperty("Volume")]
+        public float Volume { get; set; }
+        [Newtonsoft.Json.JsonProperty("Minerals")]
+        public List<Mineral> Minerals { get; set; }
+        [Newtonsoft.Json.JsonProperty("KeyMineral")]
+        public string KeyMineral { get; set; }
+
+        public int Amount { get; set; }
+    }
+
+    public class Mineral
+    {
+        [Newtonsoft.Json.JsonProperty("Name")]
+        public string Name { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("Amount")]
+        public int Amount { get; set; }
+
+        public Mineral(string Name, int Amount)
+        {
+            this.Name = Name;
+            this.Amount = Amount;
+        }
+    }
+}
